@@ -55,7 +55,17 @@ func _{{$svrType}}_{{.Name}}{{.Num}}_HTTP_Handler(srv {{$svrType}}HTTPServer) gi
 			return
 		}
 
-		c.JSON(http.StatusOK, message.GetTransformer(message.DefaultTransformerName).Transform(out))
+		data, err := encoding.GetCodec(json.Name).Marshal(message.GetTransformer(message.DefaultTransformerName).Transform(out))
+		if err != nil {
+			resp := message.GetDefinedResponse(internalerrresponse.Name)
+
+			c.JSON(resp.StatusCode(), resp)
+			c.Abort()
+			
+			return
+		}
+			
+		c.Data(http.StatusOK, "application/json", data)
 		c.Abort()
 	}
 }
