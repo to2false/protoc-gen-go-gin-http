@@ -22,6 +22,8 @@ const (
 	ginHttpPackage               = protogen.GoImportPath("github.com/to2false/go-gin-http/message")
 	ginHttpValidateFailedPackage = protogen.GoImportPath("github.com/to2false/go-gin-http/message/internalerrresponse")
 	ginHttpInternalErrPackage    = protogen.GoImportPath("github.com/to2false/go-gin-http/message/validatefailedresponse")
+	ginHttpEncodingPackage       = protogen.GoImportPath("github.com/to2false/go-gin-http/encoding")
+	ginHttpJsonEncodingPackage   = protogen.GoImportPath("github.com/to2false/go-gin-http/encoding/json")
 )
 
 var methodSets = make(map[string]int)
@@ -52,6 +54,8 @@ func generateFile(gen *protogen.Plugin, file *protogen.File, omitempty bool) *pr
 	g.P(ginHttpPackage.String())
 	g.P(ginHttpValidateFailedPackage.String())
 	g.P(ginHttpInternalErrPackage.String())
+	g.P(ginHttpEncodingPackage.String())
+	g.P(ginHttpJsonEncodingPackage.String())
 	g.P(")")
 	generateFileContent(gen, file, g, omitempty)
 	return g
