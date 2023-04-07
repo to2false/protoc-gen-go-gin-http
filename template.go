@@ -14,6 +14,8 @@ var httpTemplate = `
 const Operation{{$svrType}}{{.OriginalName}} = "/{{$svrName}}/{{.OriginalName}}"
 {{- end}}
 
+const contentType = "application/json"
+
 type {{.ServiceType}}HTTPServer interface {
 {{- range .MethodSets}}
 	{{- if ne .Comment ""}}
@@ -47,7 +49,7 @@ func _{{$svrType}}_{{.Name}}{{.Num}}_HTTP_Handler(srv {{$svrType}}HTTPServer) gi
 				return 
 			}
 			
-			c.JSON(resp.StatusCode(), dataResp)
+			c.Data(resp.StatusCode(), contentType, dataResp)
 			c.Abort()
 			
 			return
@@ -65,7 +67,7 @@ func _{{$svrType}}_{{.Name}}{{.Num}}_HTTP_Handler(srv {{$svrType}}HTTPServer) gi
 				return 
 			}
 			
-			c.JSON(resp.StatusCode(), dataResp)
+			c.Data(resp.StatusCode(), contentType, dataResp)
 			c.Abort()
 			
 			return
@@ -83,13 +85,13 @@ func _{{$svrType}}_{{.Name}}{{.Num}}_HTTP_Handler(srv {{$svrType}}HTTPServer) gi
 				return 
 			}
 			
-			c.JSON(resp.StatusCode(), dataResp)
+			c.Data(resp.StatusCode(), contentType, dataResp)
 			c.Abort()
 			
 			return
 		}
 			
-		c.Data(http.StatusOK, "application/json", data)
+		c.Data(http.StatusOK, contentType, data)
 		c.Abort()
 	}
 }
