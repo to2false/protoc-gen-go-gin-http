@@ -71,7 +71,7 @@ func _{{$svrType}}_{{.Name}}{{.Num}}_HTTP_Handler(srv {{$svrType}}HTTPServer) gi
 			return
 		}
 
-		data, err := encoding.GetCodec(json.Name).Marshal(message.GetTransformer(message.DefaultTransformerName).Transform(out))
+		data, err := encoding.GetCodec(json.Name).Marshal(message.GetTransformer(message.DefaultTransformerName).Transform(ctx, out))
 		if err != nil {
 			resp := message.GetDefinedResponse(internalerrresponse.Name)
 
