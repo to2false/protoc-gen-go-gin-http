@@ -33,11 +33,9 @@ func Register{{.ServiceType}}HTTPServer(s *gin.Engine, srv {{.ServiceType}}HTTPS
 {{range .Methods}}
 func _{{$svrType}}_{{.Name}}{{.Num}}_HTTP_Handler(srv {{$svrType}}HTTPServer) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ctx := c.Request.Context()
-
 		var in {{.Request}}
 		if err := c.ShouldBind(&in);err != nil {
-			resp := message.GetDefinedResponse(validatefailedresponse.Name).WithContext(ctx).WithReasonPhrase(err)
+			resp := message.GetDefinedResponse(validatefailedresponse.Name).WithContext(c.Request.Context()).WithReasonPhrase(err)
 
 			dataResp, e := resp.GetBody()
 			if e != nil {
@@ -53,9 +51,9 @@ func _{{$svrType}}_{{.Name}}{{.Num}}_HTTP_Handler(srv {{$svrType}}HTTPServer) gi
 			return
 		}
 
-		out, err := srv.{{.Name}}(ctx, &in)
+		out, err := srv.{{.Name}}(c.Request.Context(), &in)
 		if err != nil {
-			resp := message.GetDefinedResponse(internalerrresponse.Name).WithContext(ctx).WithReasonPhrase(err)
+			resp := message.GetDefinedResponse(internalerrresponse.Name).WithContext(c.Request.Context()).WithReasonPhrase(err)
 
 			dataResp, e := resp.GetBody()
 			if e != nil {
@@ -71,7 +69,7 @@ func _{{$svrType}}_{{.Name}}{{.Num}}_HTTP_Handler(srv {{$svrType}}HTTPServer) gi
 			return
 		}
 
-		data, err := encoding.GetCodec(json.Name).Marshal(message.GetTransformer(message.DefaultTransformerName).Transform(ctx, out))
+		data, err := encoding.GetCodec(json.Name).Marshal(message.GetTransformer(message.DefaultTransformerName).Transform(c.Request.Context(), out))
 		if err != nil {
 			resp := message.GetDefinedResponse(internalerrresponse.Name)
 
