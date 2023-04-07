@@ -37,9 +37,17 @@ func _{{$svrType}}_{{.Name}}{{.Num}}_HTTP_Handler(srv {{$svrType}}HTTPServer) gi
 
 		var in {{.Request}}
 		if err := c.ShouldBind(&in);err != nil {
-			resp := message.GetDefinedResponse(validatefailedresponse.Name)
+			resp := message.GetDefinedResponse(validatefailedresponse.Name).WithContext(ctx).WithReasonPhrase(err)
 
-			c.JSON(resp.StatusCode(), resp)
+			dataResp, e := resp.GetBody()
+			if e != nil {
+				c.JSON(resp.StatusCode(), e.Error())
+				c.Abort()
+				
+				return 
+			}
+			
+			c.JSON(resp.StatusCode(), dataResp)
 			c.Abort()
 			
 			return
@@ -47,9 +55,17 @@ func _{{$svrType}}_{{.Name}}{{.Num}}_HTTP_Handler(srv {{$svrType}}HTTPServer) gi
 
 		out, err := srv.{{.Name}}(ctx, &in)
 		if err != nil {
-			resp := message.GetDefinedResponse(internalerrresponse.Name)
+			resp := message.GetDefinedResponse(internalerrresponse.Name).WithContext(ctx).WithReasonPhrase(err)
 
-			c.JSON(resp.StatusCode(), resp)
+			dataResp, e := resp.GetBody()
+			if e != nil {
+				c.JSON(resp.StatusCode(), e.Error())
+				c.Abort()
+				
+				return 
+			}
+			
+			c.JSON(resp.StatusCode(), dataResp)
 			c.Abort()
 			
 			return
@@ -59,7 +75,15 @@ func _{{$svrType}}_{{.Name}}{{.Num}}_HTTP_Handler(srv {{$svrType}}HTTPServer) gi
 		if err != nil {
 			resp := message.GetDefinedResponse(internalerrresponse.Name)
 
-			c.JSON(resp.StatusCode(), resp)
+			dataResp, e := resp.GetBody()
+			if e != nil {
+				c.JSON(resp.StatusCode(), e.Error())
+				c.Abort()
+				
+				return 
+			}
+			
+			c.JSON(resp.StatusCode(), dataResp)
 			c.Abort()
 			
 			return
