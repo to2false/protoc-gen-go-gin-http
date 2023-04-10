@@ -51,6 +51,21 @@ func _{{$svrType}}_{{.Name}}{{.Num}}_HTTP_Handler(srv {{$svrType}}HTTPServer) gi
 			return
 		}
 
+		if err := in.Validate();err != nil {
+			statusCode, data, e := transformer.Err(c.Request.Context(), validate.NewValidate(err))
+			if e != nil {
+				c.JSON(statusCode, e.Error())
+				c.Abort()
+
+				return
+			}
+
+			c.Data(statusCode, transformer.ContentType(), data)
+			c.Abort()
+
+			return
+		}
+
 		out, err := srv.{{.Name}}(c.Request.Context(), &in)
 		if err != nil {
 			statusCode, data, e := transformer.Err(c.Request.Context(), err)
