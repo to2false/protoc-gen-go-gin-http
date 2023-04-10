@@ -67,7 +67,7 @@ func _{{$svrType}}_{{.Name}}{{.Num}}_HTTP_Handler(srv {{$svrType}}HTTPServer) gi
 			return
 		}
 
-		httpStatusCode, data, err := transformer.Transform(c.Request.Context(), out))
+		httpStatusCode, data, err := transformer.Transform(c.Request.Context(), out)
 		if err != nil {
 			statusCode, data, e := transformer.Err(c.Request.Context(), err)
 			if e != nil {
