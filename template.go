@@ -52,7 +52,7 @@ func _{{$svrType}}_{{.Name}}{{.Num}}_HTTP_Handler(srv {{$svrType}}HTTPServer) gi
 		}
 
 		if err := in.Validate();err != nil {
-			statusCode, data, e := transformer.Err(c.Request.Context(), validate.NewValidateError(err))
+			statusCode, data, e := transformer.Err(c.Request.Context(), validate.NewValidateError(err.Error()))
 			if e != nil {
 				c.JSON(statusCode, e.Error())
 				c.Abort()
