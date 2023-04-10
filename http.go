@@ -16,13 +16,10 @@ import (
 )
 
 const (
-	contextPackage             = protogen.GoImportPath("context")
-	httpPackage                = protogen.GoImportPath("net/http")
-	ginPackage                 = protogen.GoImportPath("github.com/gin-gonic/gin")
-	ginHttpPackage             = protogen.GoImportPath("github.com/to2false/go-gin-http/message")
-	ginHttpEncodingPackage     = protogen.GoImportPath("github.com/to2false/go-gin-http/encoding")
-	ginHttpJsonEncodingPackage = protogen.GoImportPath("github.com/to2false/go-gin-http/encoding/json")
-	ginHttpValidatePackage     = protogen.GoImportPath("github.com/to2false/go-gin-http/validate")
+	contextPackage         = protogen.GoImportPath("context")
+	ginPackage             = protogen.GoImportPath("github.com/gin-gonic/gin")
+	ginHttpPackage         = protogen.GoImportPath("github.com/to2false/go-gin-http/message")
+	ginHttpValidatePackage = protogen.GoImportPath("github.com/to2false/go-gin-http/validate")
 )
 
 var methodSets = make(map[string]int)
@@ -48,12 +45,9 @@ func generateFile(gen *protogen.Plugin, file *protogen.File, omitempty bool) *pr
 	g.P()
 	g.P("import (")
 	g.P(contextPackage.String())
-	g.P(httpPackage.String())
 	g.P(ginPackage.String())
 	g.P(ginHttpPackage.String())
 	g.P(ginHttpValidatePackage.String())
-	g.P(ginHttpEncodingPackage.String())
-	g.P(ginHttpJsonEncodingPackage.String())
 	g.P(")")
 	generateFileContent(gen, file, g, omitempty)
 	return g
