@@ -33,61 +33,57 @@ func Register{{.ServiceType}}HTTPServer(s *gin.Engine, srv {{.ServiceType}}HTTPS
 {{range .Methods}}
 func _{{$svrType}}_{{.Name}}{{.Num}}_HTTP_Handler(srv {{$svrType}}HTTPServer) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		transformer := message.GetTransformer(message.DefaultTransformerName)
+
 		var in {{.Request}}
 		if err := c.ShouldBind(&in);err != nil {
-			resp := message.GetDefinedResponse(validatefailedresponse.Name).WithContext(c.Request.Context()).WithReasonPhrase(err)
-
-			dataResp, e := resp.GetBody()
+			statusCode, data, e := transformer.Err(c.Request.Context(), err)
 			if e != nil {
-				c.JSON(resp.StatusCode(), e.Error())
+				c.JSON(statusCode, e.Error())
 				c.Abort()
-				
-				return 
+
+				return
 			}
-			
-			c.Data(resp.StatusCode(), "application/json", dataResp)
+
+			c.Data(statusCode, transformer.ContentType(), data)
 			c.Abort()
-			
+
 			return
 		}
 
 		out, err := srv.{{.Name}}(c.Request.Context(), &in)
 		if err != nil {
-			resp := message.GetDefinedResponse(internalerrresponse.Name).WithContext(c.Request.Context()).WithReasonPhrase(err)
-
-			dataResp, e := resp.GetBody()
+			statusCode, data, e := transformer.Err(c.Request.Context(), err)
 			if e != nil {
-				c.JSON(resp.StatusCode(), e.Error())
+				c.JSON(statusCode, e.Error())
 				c.Abort()
-				
-				return 
+
+				return
 			}
-			
-			c.Data(resp.StatusCode(), "application/json", dataResp)
+
+			c.Data(statusCode, transformer.ContentType(), data)
 			c.Abort()
-			
+
 			return
 		}
 
-		data, err := encoding.GetCodec(json.Name).Marshal(message.GetTransformer(message.DefaultTransformerName).Transform(c.Request.Context(), out))
+		httpStatusCode, data, err := transformer.Transform(c.Request.Context(), out))
 		if err != nil {
-			resp := message.GetDefinedResponse(internalerrresponse.Name)
-
-			dataResp, e := resp.GetBody()
+			statusCode, data, e := transformer.Err(c.Request.Context(), err)
 			if e != nil {
-				c.JSON(resp.StatusCode(), e.Error())
+				c.JSON(statusCode, e.Error())
 				c.Abort()
-				
-				return 
+
+				return
 			}
-			
-			c.Data(resp.StatusCode(), "application/json", dataResp)
+
+			c.Data(statusCode, transformer.ContentType(), data)
 			c.Abort()
-			
+
 			return
 		}
-			
-		c.Data(http.StatusOK, "application/json", data)
+
+		c.Data(httpStatusCode, transformer.ContentType(), data)
 		c.Abort()
 	}
 }
