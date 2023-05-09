@@ -35,6 +35,21 @@ func _{{$svrType}}_{{.Name}}{{.Num}}_HTTP_Handler(srv {{$svrType}}HTTPServer) gi
 	return func(c *gin.Context) {
 		transformer := message.GetTransformer(message.DefaultTransformerName)
 
+		if err := transformer.PreProcessRequest(c.Request);err != nil {
+			statusCode, data, e := transformer.Err(c.Request.Context(), err)
+			if e != nil {
+				c.JSON(statusCode, e.Error())
+				c.Abort()
+
+				return
+			}
+
+			c.Data(statusCode, transformer.ContentType(), data)
+			c.Abort()
+
+			return
+		}
+
 		var in {{.Request}}
 		if err := c.ShouldBind(&in);err != nil {
 			statusCode, data, e := transformer.Err(c.Request.Context(), err)
