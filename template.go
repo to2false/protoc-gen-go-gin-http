@@ -26,7 +26,7 @@ type {{.ServiceType}}HTTPServer interface {
 func Register{{.ServiceType}}HTTPServer(s *gin.RouterGroup, srv {{.ServiceType}}HTTPServer) {
 	r := s.Group("")
 	{{- range .Methods}}
-	r.{{.Method}}("{{.Path}}", handler.GinHandlerWrap[*{{.Request}}, *{{.Reply}}](message.DefaultTransformerName, srv.{{.Name}}))
+	r.{{.Method}}("{{.Path}}", handler.GinHandlerWrap[{{.Request}}, {{.Reply}}](message.DefaultTransformerName, srv.{{.Name}}))
 	{{- end}}
 }
 `
