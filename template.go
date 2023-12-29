@@ -26,98 +26,9 @@ type {{.ServiceType}}HTTPServer interface {
 func Register{{.ServiceType}}HTTPServer(s *gin.RouterGroup, srv {{.ServiceType}}HTTPServer) {
 	r := s.Group("")
 	{{- range .Methods}}
-	r.{{.Method}}("{{.Path}}", _{{$svrType}}_{{.Name}}{{.Num}}_HTTP_Handler(srv))
+	r.{{.Method}}("{{.Path}}", handler.GinHandlerWrap[*{{.Request}}, *{{.Reply}}](message.DefaultTransformerName, srv.{{.Name}})))
 	{{- end}}
 }
-
-{{range .Methods}}
-func _{{$svrType}}_{{.Name}}{{.Num}}_HTTP_Handler(srv {{$svrType}}HTTPServer) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		transformer := message.GetTransformer(message.DefaultTransformerName)
-
-		if err := transformer.PreProcessRequest(c.Request);err != nil {
-			statusCode, data, e := transformer.Err(c.Request.Context(), err)
-			if e != nil {
-				c.JSON(statusCode, e.Error())
-				c.Abort()
-
-				return
-			}
-
-			c.Data(statusCode, transformer.ContentType(), data)
-			c.Abort()
-
-			return
-		}
-
-		var in {{.Request}}
-		if err := c.ShouldBind(&in);err != nil {
-			statusCode, data, e := transformer.Err(c.Request.Context(), err)
-			if e != nil {
-				c.JSON(statusCode, e.Error())
-				c.Abort()
-
-				return
-			}
-
-			c.Data(statusCode, transformer.ContentType(), data)
-			c.Abort()
-
-			return
-		}
-
-		if err := in.Validate();err != nil {
-			statusCode, data, e := transformer.Err(c.Request.Context(), validate.NewValidateError(err.Error()))
-			if e != nil {
-				c.JSON(statusCode, e.Error())
-				c.Abort()
-
-				return
-			}
-
-			c.Data(statusCode, transformer.ContentType(), data)
-			c.Abort()
-
-			return
-		}
-
-		out, err := srv.{{.Name}}(c.Request.Context(), &in)
-		if err != nil {
-			statusCode, data, e := transformer.Err(c.Request.Context(), err)
-			if e != nil {
-				c.JSON(statusCode, e.Error())
-				c.Abort()
-
-				return
-			}
-
-			c.Data(statusCode, transformer.ContentType(), data)
-			c.Abort()
-
-			return
-		}
-
-		httpStatusCode, data, err := transformer.Transform(c.Request.Context(), out)
-		if err != nil {
-			statusCode, data, e := transformer.Err(c.Request.Context(), err)
-			if e != nil {
-				c.JSON(statusCode, e.Error())
-				c.Abort()
-
-				return
-			}
-
-			c.Data(statusCode, transformer.ContentType(), data)
-			c.Abort()
-
-			return
-		}
-
-		c.Data(httpStatusCode, transformer.ContentType(), data)
-		c.Abort()
-	}
-}
-{{end}}
 `
 
 type serviceDesc struct {
