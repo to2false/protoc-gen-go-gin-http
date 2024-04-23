@@ -14,6 +14,10 @@ var httpTemplate = `
 const Operation{{$svrType}}{{.OriginalName}} = "/{{$svrName}}/{{.OriginalName}}"
 {{- end}}
 
+{{- range .MethodSets}}
+const Path{{$svrType}}{{.OriginalName}} = "{{.Path}}"
+{{- end}}
+
 type {{.ServiceType}}HTTPServer interface {
 {{- range .MethodSets}}
 	{{- if ne .Comment ""}}
